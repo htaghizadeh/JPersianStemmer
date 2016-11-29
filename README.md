@@ -12,9 +12,8 @@ Go to dist folder to use PersianStemmer!
 
 ## Papers
 A New Hybrid Stemming Method for Persian Language
-[link] http://dsh.oxfordjournals.org/content/early/2015/11/06/llc.fqv053.abstract
-[DOI] http://dx.doi.org/10.1093/llc/fqv053
-
+[link](http://dsh.oxfordjournals.org/content/early/2015/11/06/llc.fqv053.abstract)
+[DOI](http://dx.doi.org/10.1093/llc/fqv053)
 
 یک ریشه یاب فارسی مبتنی بر قاعده با استفاده از عبارات منظم
-[link] http://www.civilica.com/Paper-ICS11-ICS11_109.html
+[link](http://www.civilica.com/Paper-ICS11-ICS11_109.html)
