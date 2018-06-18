@@ -1,13 +1,18 @@
 # PersianStemmer-Java
 
-Go to dist folder to use PersianStemmer!
+## Build
+
+```console
+gradlew clean
+gradlew build
+```
 
 ## Code Example
 
 ```java
-    import htz.ir.stemming.PersianStemmer;
+    import com.intellitext.persian.Stemmer;
     
-    PersianStemmer ps = new PersianStemmer();
+    Stemmer ps = new Stemmer();
     System.out.println(ps.run("زیباست"));
 ```
 
