@@ -1,0 +1,113 @@
+plugins {
+    id 'java-library'
+}
+
+printf "Host: %s\nOS: %s %s %s\nJVM: %s %s %s %s\nGroovy: %s\nGradle: %s\n" +
+        "Build: group: ${project.group} name: ${project.name} version: ${project.version} '${project.description}',\n",
+        InetAddress.getLocalHost(),
+        System.getProperty("os.name"),
+        System.getProperty("os.arch"),
+        System.getProperty("os.version"),
+        System.getProperty("java.version"),
+        System.getProperty("java.vm.version"),
+        System.getProperty("java.vm.vendor"),
+        System.getProperty("java.vm.name"),
+        GroovySystem.getVersion(),
+        gradle.gradleVersion
+
+apply plugin: 'java'
+apply plugin: 'maven'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    mavenCentral()
+    maven { url "https://repository.apache.org/content/repositories/releases/" }
+    maven { url "http://maven.restlet.com/" }
+    flatDir { dirs 'libs' }
+    jcenter()
+}
+
+
+configurations {
+    wagon
+    distJars {
+        extendsFrom runtime
+        //exclude group: 'org.apache.commons'
+        exclude module: 'jna'
+        exclude module: 'jackson-core'
+        exclude module: 'jackson-dataformat-smile'
+        exclude module: 'jackson-dataformat-yaml'
+    }
+}
+
+dependencies {
+    compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
+
+    distJars "${project.group}:${project.name}:${project.version}"
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': project.description, 'Implementation-Version': project.version
+    }
+}
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:all" << "-profile" << "compact2"
+}
+
+task(runMain, dependsOn: 'classes', type: JavaExec) {
+    main = 'com.intellitext.Main'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+test {
+    systemProperties['path.home'] = System.getProperty("user.dir")
+    testLogging {
+        showStandardStreams = false
+        exceptionFormat = 'full'
+    }
+}
+
+task buildPluginZip(type: Zip, dependsOn: [':jar']) {
+    from configurations.distJars
+    from 'build/tmp/plugin'
+    //into 'solr'
+    classifier = 'plugin'
+}
+
+task unpackPlugin(type: Copy, dependsOn: [':buildPluginZip']) {
+    delete "plugins"
+    from configurations.distJars
+    from 'build/tmp/plugin'
+    into "plugins/${project.name}"
+}
+
+clean {
+    delete "plugins"
+    delete "data"
+    delete "logs"
+}
+
+task javadocJar(type: Jar, dependsOn: classes) {
+    from javadoc
+    into 'build/tmp'
+    classifier 'javadoc'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    from sourceSets.main.allSource
+    into 'build/tmp'
+    classifier 'sources'
+}
+
+artifacts {
+    archives buildPluginZip
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.5'
+}
